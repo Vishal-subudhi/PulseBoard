@@ -9,9 +9,9 @@ export default async function DashboardLayout({ children }) {
   if (!user) redirect('/login')
 
   return (
-    <div className="flex min-h-screen bg-[#0f1117]">
+    <div className="flex min-h-screen bg-[#070B14] bg-grid">
       <Sidebar user={user} />
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 ml-64 p-8 min-h-screen">
         {children}
       </main>
     </div>
