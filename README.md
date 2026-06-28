@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PulseBoard — SaaS Analytics Dashboard 📊
 
-## Getting Started
+A multi-tenant SaaS analytics dashboard built in Next.js 14 that lets users analyse GitHub profiles and repository data. First Next.js project in the roadmap — introduces App Router, Server Components, and Supabase authentication.
 
-First, run the development server:
+## Live Demo
+[GitHub Repo](https://github.com/Vishal-subudhi/pulseboard)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+- GitHub analytics dashboard — repos, languages, activity stats
+- Supabase authentication (sign up, login, logout)
+- Protected routes — dashboard only accessible when logged in
+- Multi-tenant data isolation via Row Level Security (RLS)
+- Server Components for fast, secure data fetching
+- Client Components for interactive UI elements
+- Dynamic greeting — Good morning / Good afternoon / Good evening based on time
+- Zustand for client-side state management
+- Responsive dark theme dashboard layout
+
+## Tech Stack
+- Next.js 14 (App Router)
+- React Server Components
+- Supabase (Auth + PostgreSQL database + Row Level Security)
+- Zustand (client state)
+- Tailwind CSS v3
+- GitHub REST API
+
+## Project Structure
+```
+pulseboard/
+  app/
+    (auth)/
+      login/page.jsx
+      signup/page.jsx
+    (dashboard)/
+      dashboard/page.jsx     ← Server Component
+      layout.jsx             ← Protected layout
+    layout.jsx               ← Root layout
+    page.jsx                 ← Landing page
+  components/
+    DashboardHeader.jsx      ← Greeting + user info
+    StatsGrid.jsx            ← Repo/follower stats
+    LanguageChart.jsx        ← Language distribution
+    RepoList.jsx             ← Top repositories
+  lib/
+    supabase.js              ← Supabase client
+    github.js                ← GitHub API helpers
+  store/
+    dashboardStore.js        ← Zustand store
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How to run
+1. Clone the repo
+2. Run `npm install`
+3. Create a Supabase project at supabase.com
+4. Create a `.env.local` file:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+5. Run `npm run dev`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Key Concepts Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Next.js 14 App Router
+First project using the App Router. Key mental model shift from React:
+- Server Components (default) — fetch data before page reaches browser, no loading spinners
+- Client Components ("use client") — useState, useEffect, user interaction
+- Server Components can contain Client Components, not the other way around
 
-## Learn More
+### Supabase Row Level Security
+Each user's data is isolated at the database level:
+```sql
+CREATE POLICY "Users see only their own data"
+ON github_stats
+FOR SELECT
+USING (auth.uid() = user_id);
+```
+No extra backend code needed — the database enforces privacy automatically.
 
-To learn more about Next.js, take a look at the following resources:
+### Greeting Feature (added independently)
+```jsx
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return "Good morning"
+  if (hour < 17) return "Good afternoon"
+  return "Good evening"
+}
+```
+Small feature, added independently — identified where it belonged in the component tree and wired it in without guidance.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Server vs Client Component Split
+```
+DashboardPage (Server)     ← fetches GitHub data server-side
+  ├── DashboardHeader (Client)   ← greeting, needs time/interactivity
+  ├── StatsGrid (Server)         ← static display, no interaction
+  ├── LanguageChart (Client)     ← interactive chart, onClick
+  └── RepoList (Server)          ← static list, no interaction
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Vibe Coding Notes
+This project was built using the vibe coding process:
+- Architecture and component structure designed by the developer
+- AI generated the boilerplate and wiring
+- Developer reviewed every component, asked questions about unfamiliar patterns
+- Greeting feature added independently — identified the right location and logic without prompting
+- Key learning: understanding Server vs Client component boundaries, not just running the code
 
-## Deploy on Vercel
+## Reflection
+**Project:** PulseBoard — SaaS Analytics Dashboard
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Date completed:** 28/06/2026
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**What I built:** A SaaS analytics dashboard in Next.js 14 with Supabase auth, GitHub data analysis, protected routes, and Row Level Security
+
+**Main concepts learned:** Next.js 14 App Router, Server Components vs Client Components, Supabase authentication, Row Level Security, multi-tenant data architecture
+
+**What was hardest:** Internalizing the Server vs Client component mental model — which code runs where and why it matters
+
+**What I'd do differently:** Add more analytics features and polish the UI for a more complete SaaS feel
+
+**Feature I added myself:** Dynamic greeting (Good morning/afternoon/evening) based on time of day
+
+**Time taken:** 10 days
