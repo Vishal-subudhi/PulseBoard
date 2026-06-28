@@ -1,58 +1,31 @@
 # PulseBoard — SaaS Analytics Dashboard 📊
 
-A multi-tenant SaaS analytics dashboard built in Next.js 14 that lets users analyse GitHub profiles and repository data. First Next.js project in the roadmap — introduces App Router, Server Components, and Supabase authentication.
+A multi-tenant SaaS analytics dashboard built in Next.js 14 with Supabase authentication. Users log in, connect their GitHub, and view analytics about their repositories and activity in a clean dashboard UI.
 
 ## Live Demo
 [GitHub Repo](https://github.com/Vishal-subudhi/pulseboard)
 
 ## Features
-- GitHub analytics dashboard — repos, languages, activity stats
-- Supabase authentication (sign up, login, logout)
-- Protected routes — dashboard only accessible when logged in
-- Multi-tenant data isolation via Row Level Security (RLS)
-- Server Components for fast, secure data fetching
-- Client Components for interactive UI elements
-- Dynamic greeting — Good morning / Good afternoon / Good evening based on time
-- Zustand for client-side state management
-- Responsive dark theme dashboard layout
+- Supabase authentication — sign up, log in, log out
+- Protected dashboard — only accessible when logged in
+- GitHub analytics — total repos connected, activity overview
+- Dynamic greeting — Good morning / Good afternoon / Good evening based on time of day
+- Multi-tenant data isolation via Supabase Row Level Security
+- Server Components for fast initial page loads
+- Dark theme responsive dashboard layout
 
 ## Tech Stack
 - Next.js 14 (App Router)
 - React Server Components
-- Supabase (Auth + PostgreSQL database + Row Level Security)
-- Zustand (client state)
+- Supabase (Auth + PostgreSQL + Row Level Security)
+- Zustand (client-side state)
 - Tailwind CSS v3
-- GitHub REST API
-
-## Project Structure
-```
-pulseboard/
-  app/
-    (auth)/
-      login/page.jsx
-      signup/page.jsx
-    (dashboard)/
-      dashboard/page.jsx     ← Server Component
-      layout.jsx             ← Protected layout
-    layout.jsx               ← Root layout
-    page.jsx                 ← Landing page
-  components/
-    DashboardHeader.jsx      ← Greeting + user info
-    StatsGrid.jsx            ← Repo/follower stats
-    LanguageChart.jsx        ← Language distribution
-    RepoList.jsx             ← Top repositories
-  lib/
-    supabase.js              ← Supabase client
-    github.js                ← GitHub API helpers
-  store/
-    dashboardStore.js        ← Zustand store
-```
 
 ## How to run
 1. Clone the repo
 2. Run `npm install`
 3. Create a Supabase project at supabase.com
-4. Create a `.env.local` file:
+4. Create `.env.local`:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -62,20 +35,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ## Key Concepts Used
 
 ### Next.js 14 App Router
-First project using the App Router. Key mental model shift from React:
-- Server Components (default) — fetch data before page reaches browser, no loading spinners
+First project using Next.js — biggest learning was the Server vs Client split:
+- Server Components (default) — fetch data before reaching the browser, no loading spinners
 - Client Components ("use client") — useState, useEffect, user interaction
-- Server Components can contain Client Components, not the other way around
+- Protected routes using Next.js middleware and Supabase session
 
 ### Supabase Row Level Security
-Each user's data is isolated at the database level:
+Each user only sees their own data — enforced at the database level:
 ```sql
 CREATE POLICY "Users see only their own data"
-ON github_stats
+ON user_stats
 FOR SELECT
 USING (auth.uid() = user_id);
 ```
-No extra backend code needed — the database enforces privacy automatically.
 
 ### Greeting Feature (added independently)
 ```jsx
@@ -86,38 +58,24 @@ function getGreeting() {
   return "Good evening"
 }
 ```
-Small feature, added independently — identified where it belonged in the component tree and wired it in without guidance.
-
-## Server vs Client Component Split
-```
-DashboardPage (Server)     ← fetches GitHub data server-side
-  ├── DashboardHeader (Client)   ← greeting, needs time/interactivity
-  ├── StatsGrid (Server)         ← static display, no interaction
-  ├── LanguageChart (Client)     ← interactive chart, onClick
-  └── RepoList (Server)          ← static list, no interaction
-```
+Small feature added without guidance — identified the right component and wired it in independently.
 
 ## Vibe Coding Notes
-This project was built using the vibe coding process:
-- Architecture and component structure designed by the developer
-- AI generated the boilerplate and wiring
-- Developer reviewed every component, asked questions about unfamiliar patterns
-- Greeting feature added independently — identified the right location and logic without prompting
-- Key learning: understanding Server vs Client component boundaries, not just running the code
+Built using the vibe coding process — architecture designed by the developer, boilerplate AI-generated, developer reviewed every component and made all product decisions. The greeting feature was added entirely independently.
 
 ## Reflection
 **Project:** PulseBoard — SaaS Analytics Dashboard
 
 **Date completed:** 28/06/2026
 
-**What I built:** A SaaS analytics dashboard in Next.js 14 with Supabase auth, GitHub data analysis, protected routes, and Row Level Security
+**What I built:** A SaaS analytics dashboard with Supabase login, protected routes, GitHub repo analytics, and a time-based greeting
 
-**Main concepts learned:** Next.js 14 App Router, Server Components vs Client Components, Supabase authentication, Row Level Security, multi-tenant data architecture
+**Main concepts learned:** Next.js 14 App Router, Server vs Client Components, Supabase authentication, Row Level Security, protected routing
 
-**What was hardest:** Internalizing the Server vs Client component mental model — which code runs where and why it matters
+**What was hardest:** Understanding the Server vs Client component mental model — which code runs where and why
 
-**What I'd do differently:** Add more analytics features and polish the UI for a more complete SaaS feel
+**What I'd do differently:** Add more detailed analytics and a richer dashboard with charts
 
-**Feature I added myself:** Dynamic greeting (Good morning/afternoon/evening) based on time of day
+**Feature I added myself:** Dynamic greeting based on time of day
 
 **Time taken:** 10 days
